@@ -1,46 +1,21 @@
-# samplestorage
+# multiscale-array [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-Samples storage with overallocation and multiscale stats. In single-scale mode it is just an array optimized for big data input, in multiscale mode it is like 1d mipmaps, with _min_, _max_ and _average_ stats (can be customized). Direct purpose is storing data for waveform rendering, like [gl-waveform](https://github.com/audio-lab/gl-waveform), [wavearea](https://github.com/audio-lab/wavearea), but probably can be used for generic big-data rendering.
+Create multiple scales representation for an array (see [scale-space](https://en.wikipedia.org/wiki/Scale_space) for the concept). It is simplest form of convolution with resampling, where the upper level is perfectly 2 times less than the lower level. Similar to mipmaps, but 1d. Direct purpose is storing data for waveform rendering, like [gl-waveform](https://github.com/audio-lab/gl-waveform), [wavearea](https://github.com/audio-lab/wavearea) etc.
+
+[![npm install multiscale-array](https://nodei.co/npm/multiscale-array.png?mini=true)](https://npmjs.org/package/multiscale-array/)
 
 ```js
-const Storage = require('samplestorage');
+const multiscale = require('multiscale-array');
 
-//default options, can be omitted
-let samples = Storage({
-	//stats to calculate for each scale, based on 2 samples of lower scale
-	//null means there is no scales
-	stats: {
-		//convolution with 2-samples kernel
-		avg: (a, b) => a*.5 + b*.5,
-		max: Math.max,
-		min: Math.min
-	},
-
-	//overallocation block size, larger takes more memory, lesser hits performance
-	//because array.push() is O(N)
-	allocBlockSize: Math.pow(2, 16),
-
-	//collect stats up to the scale, must be power of 2 or null. If 1 — it works as a simple array with overallocation
-	maxScale: allocBlockSize
+let data = Array(1e7);
+let scales = multiscale(data, {
+	maxScale: 65536,
+	reduce: (a, b) => a*.5 + b*.5
 });
 
-//put new data, calculates stats automatically
-let length = samples.push(data);
+//if source array has changed - invoke this to recalculate scales
+scales.update(from, to);
 
-//get data for the range, for NPOT scales it will linearly subsample result.
-//scale is the same as group size, or number of samples per bar
-let {max, min} = samples.get({from: 0, to: -0, scale: 2, data: ['max', 'min']});
-
-//or simply get data for the range
-{max, min} = samples.get(0, 100);
+//get data for the scale 2
+scales[2];
 ```
-
-The storage can be used as a web-worker:
-
-```js
-const samples = require('samplestorage/worker')();
-
-samples.push(data, length => {});
-samples.get(opts, data => {});
-```
-
