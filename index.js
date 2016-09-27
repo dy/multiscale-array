@@ -10,14 +10,14 @@
 // const fromDb = require('decibels/to-gain');
 // const toDb = require('decibels/from-gain');
 const idx = require('negative-index');
-const bits = require('bit-twiddle');
 
 module.exports = Storage;
 
 function Storage (opts) {
 	opts = opts || {};
-	if (!opts.allocBlockSize) opts.allocBlockSize = Math.pow(2, 16);
-	if (!opts.maxScale) opts.maxScale = 0;
+
+	let allocBlockSize = opts.allocBlockSize || Math.pow(2, 16);
+	let maxScale = opts.maxScale || Math.pow(2, 16);
 
 	//reducers are (convolvers in general) any fn of 2 samples returning some value
 	let reducers = opts.stats;
@@ -47,13 +47,15 @@ function Storage (opts) {
 
 	//put new samples
 	function push (chunk) {
-		ensureSize(chunk.length + last);
+		let newLength = chunk.length + last;
+
+		ensureSize(newLength);
 
 		for (let i = 0; i < chunk.length; i++) {
 			buffer[last + i] = chunk[i];
 		}
 
-		last += chunk.length;
+		last = newLength;
 
 		update(last - chunk.length, last);
 
@@ -63,17 +65,16 @@ function Storage (opts) {
 	function ensureSize (size) {
 		if (buffer.length > size) return;
 
-		let allocBlockSize = Math.pow(2, 16);
-
 		//ensure size of storage
 		buffer = buffer.concat(Array(allocBlockSize).fill(0));
 		statNames.forEach(name => {
 			stats[name][0] = buffer;
 		});
 
+		if (!statNames.length || maxScale <= 1) return;
+
 		//ensure size of all little scales
-		let maxGroup = bits.prevPow2(size);
-		for (let group = 2, idx = 1; group <= maxGroup; group*=2, idx++) {
+		for (let group = 2, idx = 1; group <= maxScale; group*=2, idx++) {
 			statNames.forEach(name => {
 				let scales = stats[name];
 				if (!scales[idx]) scales[idx] = [];
@@ -86,15 +87,15 @@ function Storage (opts) {
 
 	//recalculate stats for the range
 	function update (start, end) {
+		if (!statNames.length || maxScale <= 1) return;
+
 		if (start == null) start = 0;
 		if (end == null) end = last;
 
 		start = idx(start, last);
 		end = idx(end, last);
 
-		let maxGroup = bits.prevPow2(last);
-
-		for (let group = 2, idx = 1; group <= maxGroup; group*=2, idx++) {
+		for (let group = 2, idx = 1; group <= maxScale; group*=2, idx++) {
 			let groupStart = Math.floor(start/group), groupEnd = Math.floor(end/group);
 
 			statNames.forEach(name => {

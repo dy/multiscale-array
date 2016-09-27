@@ -7,9 +7,6 @@ const Storage = require('samplestorage');
 
 //default options, can be omitted
 let samples = Storage({
-	//collect stats up to scale, must be power of 2 or null. If 1 — it works as a simple array with overallocation
-	maxScale: null,
-
 	//stats to calculate for each scale, based on 2 samples of lower scale
 	//null means there is no scales
 	stats: {
@@ -21,7 +18,10 @@ let samples = Storage({
 
 	//overallocation block size, larger takes more memory, lesser hits performance
 	//because array.push() is O(N)
-	allocBlockSize: Math.pow(2, 16)
+	allocBlockSize: Math.pow(2, 16),
+
+	//collect stats up to the scale, must be power of 2 or null. If 1 — it works as a simple array with overallocation
+	maxScale: allocBlockSize
 });
 
 //put new data, calculates stats automatically
