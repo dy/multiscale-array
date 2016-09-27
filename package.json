@@ -1,0 +1,30 @@
+{
+  "name": "samplestorage",
+  "version": "1.0.0",
+  "description": "Buffer optimized for waveform/samples data",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dfcreative/samplestorage.git"
+  },
+  "keywords": [
+    "audio",
+    "samples",
+    "waveform",
+    "storage",
+    "data"
+  ],
+  "author": "ΔY <dfcreative@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dfcreative/samplestorage/issues"
+  },
+  "homepage": "https://github.com/dfcreative/samplestorage#readme",
+  "dependencies": {
+    "bit-twiddle": "^1.0.2",
+    "negative-index": "^1.0.0"
+  }
+}
