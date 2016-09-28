@@ -1,6 +1,6 @@
 {
   "name": "multiscale-array",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Buffer optimized for waveform/samples data",
   "main": "index.js",
   "scripts": {
@@ -23,8 +23,7 @@
     "url": "https://github.com/dfcreative/multiscale-array/issues"
   },
   "homepage": "https://github.com/dfcreative/multiscale-array#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "tape": "^4.6.0"
   }
