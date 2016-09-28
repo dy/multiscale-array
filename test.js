@@ -1,3 +1,5 @@
+'use strict';
+
 let Storage = require('./');
 let assert = require('assert');
 
@@ -24,3 +26,8 @@ for (let i = 0; i < 50; i++) {
 assert.deepEqual(scales[5], [0.890625, 0.5, 0.828125, 1]);
 scales.update();
 assert.deepEqual(scales[5], [0.890625, 0.5, 0.828125, .5625, .5]);
+
+
+let data2 = Array(100).fill(0);
+scales.update(data2);
+assert.deepEqual(scales[5], [0, 0, 0, 0]);

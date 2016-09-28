@@ -35,9 +35,28 @@ function createScales (buffer, opts) {
 	return scales;
 
 	//recalculate stats for the range
-	function update (start, end) {
+	function update (arr, start, end) {
+		if (typeof arr === 'number' || arr == null) {
+			end = start;
+			start = arr;
+		}
+		//update array, if passed one
+		else {
+			if (arr.length == null) throw Error('New data should be array[ish]')
+
+			//rescind lengths if new data is smaller
+			if (arr.length < scales[0].length) {
+				for (let group = 2, idx = 1; group <= maxScale; group*=2, idx++) {
+					let len = Math.ceil(arr.length/group);
+					scales[idx].length = len;
+				}
+			}
+
+			scales[0] = arr;
+		}
+
 		if (start == null) start = 0;
-		if (end == null) end = buffer.length;
+		if (end == null) end = scales[0].length;
 
 		for (let group = 2, idx = 1; group <= maxScale; group*=2, idx++) {
 			let scaleBuffer = scales[idx];
@@ -47,9 +66,9 @@ function createScales (buffer, opts) {
 			//ensure size
 			if (scaleBuffer.length < len) scaleBuffer.length = len;
 
-			let groupStart = Math.floor(start/group), groupEnd = len;
+			let groupStart = Math.floor(start/group);
 
-			for (let i = groupStart; i < groupEnd; i++) {
+			for (let i = groupStart; i < len; i++) {
 				let left = prevScaleBuffer[i*2];
 				if (left === undefined) left = 0;
 				let right = prevScaleBuffer[i*2+1];
