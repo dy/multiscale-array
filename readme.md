@@ -13,13 +13,16 @@ let scales = multiscale(data, {
 	reduce: (a, b) => a*.5 + b*.5
 })
 
-//if source array has changed - invoke this to recalculate scales, this is O(2N)
+//recalculate scales for the data range, this is O(2N)
 scales.update(from?, to?)
 
-//if source array is no more actual - pass the new array with the range to recalculate
+//pass new data and recalc scales for it
 scales.update(newData, from?, to?)
 
 //get data for the scale 2⁴
-scales[4]
+scales[4];
+
+//subset scales, like slice but mutable (!)
+scales.subset(from, to)
 ```
 

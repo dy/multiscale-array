@@ -23,7 +23,9 @@
     "url": "https://github.com/dfcreative/multiscale-array/issues"
   },
   "homepage": "https://github.com/dfcreative/multiscale-array#readme",
-  "dependencies": {},
+  "dependencies": {
+    "negative-index": "^1.0.1"
+  },
   "devDependencies": {
     "tape": "^4.6.0"
   }

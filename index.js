@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const nidx = require('negative-index');
+
 module.exports = createScales;
 
 function createScales (buffer, opts) {
@@ -30,6 +32,7 @@ function createScales (buffer, opts) {
 
 	scales.scales = scales;
 	scales.update = update;
+	scales.subset = subset;
 	update();
 
 	return scales;
@@ -39,12 +42,13 @@ function createScales (buffer, opts) {
 		if (typeof arr === 'number' || arr == null) {
 			end = start;
 			start = arr;
+			arr = null;
 		}
 		//update array, if passed one
 		else {
 			if (arr.length == null) throw Error('New data should be array[ish]')
 
-			//rescind lengths if new data is smaller
+			//reset lengths if new data is smaller
 			if (arr.length < scales[0].length) {
 				for (let group = 2, idx = 1; group <= maxScale; group*=2, idx++) {
 					let len = Math.ceil(arr.length/group);
@@ -57,6 +61,9 @@ function createScales (buffer, opts) {
 
 		if (start == null) start = 0;
 		if (end == null) end = scales[0].length;
+
+		start = nidx(start, scales[0].length);
+		end = nidx(end, scales[0].length);
 
 		for (let group = 2, idx = 1; group <= maxScale; group*=2, idx++) {
 			let scaleBuffer = scales[idx];
@@ -75,6 +82,23 @@ function createScales (buffer, opts) {
 				if (right === undefined) right = left;
 				scaleBuffer[i] = reduce(left, right);
 			}
+		}
+
+		return scales;
+	}
+
+	//return subset of scales with sliced data
+	function subset (start, end) {
+		if (start == null) start = 0;
+		if (end == null) end = scales[0].length;
+
+		start = nidx(start, scales[0].length);
+		end = nidx(end, scales[0].length);
+
+		for (let group = 2, idx = 1; group <= maxScale; group*=2, idx++) {
+			let groupEnd = Math.round(end/group);
+			let groupStart = Math.floor(start/group);
+			scales[idx] = scales[idx].slice(groupStart, groupEnd);
 		}
 
 		return scales;

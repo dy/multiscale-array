@@ -31,3 +31,6 @@ assert.deepEqual(scales[5], [0.890625, 0.5, 0.828125, .5625, .5]);
 let data2 = Array(100).fill(0);
 scales.update(data2);
 assert.deepEqual(scales[5], [0, 0, 0, 0]);
+
+scales.subset(-50);
+assert.deepEqual(scales[5], [0, 0]);
