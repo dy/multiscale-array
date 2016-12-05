@@ -21,7 +21,7 @@ function createScales (buffer, opts) {
 
 	if (maxScale < 2) throw Error('Bad scales');
 
-	let reduce = opts.reduce || ((a, b) => a*.5 + b*.5);
+	let reduce = opts.reduce || ((left, right, i, l) => left*.5 + right*.5);
 
 	//list of data  for scales, scale index is the power of 2
 	let scales = [buffer];
@@ -80,7 +80,7 @@ function createScales (buffer, opts) {
 				if (left === undefined) left = 0;
 				let right = prevScaleBuffer[i*2+1];
 				if (right === undefined) right = left;
-				scaleBuffer[i] = reduce(left, right);
+				scaleBuffer[i] = reduce(left, right, i*2, idx-1);
 			}
 		}
 

@@ -9,20 +9,23 @@ const multiscale = require('multiscale-array')
 
 let data = Array(1e7)
 let scales = multiscale(data, {
+	//max group of samples
 	maxScale: 65536,
-	reduce: (a, b) => a*.5 + b*.5
+
+	//how to form upper level from two samples of lower level
+	reduce: (left, right, i, level) => .5*left + .5*right
 })
 
 //recalculate scales for the data range, this is O(2N)
 scales.update(from?, to?)
 
-//pass new data and recalc scales for it
+//replace old data with the new data and recalc scales for it
 scales.update(newData, from?, to?)
 
 //get data for the scale 2⁴
-scales[4];
+let scaleData = scales[4];
 
-//subset scales, like slice but mutable (!)
+//subset scales, i.e. slice all scales, but mutable (!)
 scales.subset(from, to)
 ```
 
